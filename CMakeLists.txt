@@ -31,10 +31,12 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADER_LIST})
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)
 source_group(TREE "${PROJECT_SOURCE_DIR}/include" PREFIX "Header Files" FILES ${HEADER_LIST})
+install (TARGETS ${PROJECT_NAME} LIBRARY DESTINATION lib)
 
 # pybind
 pybind11_add_module(${PROJECT_NAME}py pybind/WaveformDataPacket.cc)
 target_link_libraries(${PROJECT_NAME}py PRIVATE ${PROJECT_NAME})
+install(TARGETS ${PROJECT_NAME}py LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES})
 
 # ctests
 add_library(test_main OBJECT ctests/test_main.cc)
