@@ -4,6 +4,7 @@
 #ifndef SSTCEED_WAVEFORM_H
 #define SSTCEED_WAVEFORM_H
 
+#include "sstCEED/WaveformDataPacket.h"
 #include <cstdint>
 #include <iostream>
 
@@ -22,7 +23,11 @@ public:
     Waveform() = default;
     ~Waveform() = default;
 
-    void Associate(uint8_t* waveform_start) { waveform_ = waveform_start; }
+    void Associate(WaveformDataPacket& packet, uint16_t waveform_index) {
+      uint16_t waveform_start = packet.GetWaveformStart(waveform_index);
+      waveform_ = &packet.GetDataPacket()[waveform_start];
+    }
+
     bool IsAssociated() { return waveform_; }
 
     bool IsErrorFlagOn() const { return waveform_[0] & 0x1u; }

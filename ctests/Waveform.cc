@@ -4,8 +4,7 @@
 #include "sstCEED/WaveformDataPacket.h"
 #include "sstCEED/Waveform.h"
 #include "doctest.h"
-#include "test_utils.h"
-
+#include <fstream>
 
 namespace cta {
 namespace sstceed {
@@ -13,19 +12,21 @@ namespace sstceed {
 TEST_CASE("Waveform") {
     std::string path = "../share/sstCEED/waveform_data_packet_example.bin";
     size_t packet_size = 8276;
-    WaveformDataPacket data_packet(packet_size);
-    ReadBinary(path, data_packet.GetDataPacket(), packet_size);
+    std::ifstream file (path, std::ios::in | std::ios::binary);
+    CHECK(file.is_open());
+    WaveformDataPacket packet(packet_size);
+    file.read(reinterpret_cast<char*>(packet.GetDataPacket()), packet_size);
 
     SUBCASE("Associate") {
         Waveform waveform{};
         CHECK(!waveform.IsAssociated());
-        waveform.Associate(data_packet.GetWaveformPointer(0));
+        waveform.Associate(packet, 0);
         CHECK(waveform.IsAssociated());
     }
 
     SUBCASE("Getters") {
         Waveform waveform{};
-        waveform.Associate(data_packet.GetWaveformPointer(20));
+        waveform.Associate(packet, 20);
         CHECK(!waveform.IsErrorFlagOn());
         CHECK(waveform.GetChannelID() == 4);
         CHECK(waveform.GetASICID() == 1);
@@ -40,16 +41,16 @@ TEST_CASE("Waveform") {
 
     SUBCASE("Setters") {
         Waveform waveform{};
-        waveform.Associate(data_packet.GetWaveformPointer(20));
+        waveform.Associate(packet, 20);
         REQUIRE(waveform.GetSample12bit(0) != 4000);
         waveform.SetSample12bit(0, 4000);
-        REQUIRE(waveform.GetSample12bit(0) == 4000);
-        REQUIRE(waveform.GetSample16bit(0) == 4000);
+        CHECK(waveform.GetSample12bit(0) == 4000);
+        CHECK(waveform.GetSample16bit(0) == 4000);
 
         REQUIRE(waveform.GetSample16bit(0) != 65000);
         waveform.SetSample16bit(0, 65000);
-        REQUIRE(waveform.GetSample12bit(0) != 65000); // Overflow
-        REQUIRE(waveform.GetSample16bit(0) == 65000);
+        CHECK(waveform.GetSample12bit(0) != 65000); // Overflow
+        CHECK(waveform.GetSample16bit(0) == 65000);
     }
 }
 

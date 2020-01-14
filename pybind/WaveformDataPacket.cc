@@ -20,12 +20,12 @@ public:
     }
 };
 
-PYBIND11_MODULE(sstCEEDpy, m) {
-    py::class_<WaveformDataPacketPy> datapacket(m, "WaveformDataPacket");
+void waveform_data_packet(py::module &m) {
+    py::class_<WaveformDataPacket> datapacketbase(m, "_WaveformDataPacket");
+    py::class_<WaveformDataPacketPy, WaveformDataPacket> datapacket(m, "WaveformDataPacket");
     datapacket.def(py::init<size_t>());
     datapacket.def("GetDataPacket", &WaveformDataPacketPy::GetDataPacketBuffer, py::return_value_policy::reference_internal);
     datapacket.def("GetPacketSize", &WaveformDataPacketPy::GetPacketSize);
-    datapacket.def("GetWaveformPointer", &WaveformDataPacketPy::GetWaveformPointer, py::return_value_policy::reference_internal);
     datapacket.def("GetNWaveforms", &WaveformDataPacketPy::GetNWaveforms);
     datapacket.def("GetRegisterSetup", &WaveformDataPacketPy::GetRegisterSetup);
     datapacket.def("IsLastSubPacket", &WaveformDataPacketPy::IsLastSubPacket);
@@ -50,23 +50,12 @@ PYBIND11_MODULE(sstCEEDpy, m) {
     datapacket.def("GetWaveformSamplesNBytes", &WaveformDataPacketPy::GetWaveformSamplesNBytes);
     datapacket.def("GetWaveformNSamples", &WaveformDataPacketPy::GetWaveformNSamples);
     datapacket.def("GetWaveformNBytes", &WaveformDataPacketPy::GetWaveformNBytes);
+    datapacket.def("GetWaveformStart", &WaveformDataPacketPy::GetWaveformStart);
     datapacket.def("GetPacketNBytes", &WaveformDataPacketPy::GetPacketNBytes);
     datapacket.def("CalculatePacketSizeBytes", &WaveformDataPacketPy::CalculatePacketSizeBytes);
     datapacket.def("CalculateCellID", &WaveformDataPacketPy::CalculateCellID);
     datapacket.def("CalculateRowColumnBlockPhase", &WaveformDataPacketPy::CalculateRowColumnBlockPhase);
     datapacket.def("IsValid", &WaveformDataPacketPy::IsValid);
-
-//    datapacket.def_buffer([](&WaveformDataPacketPy::GetDataPacket) -> py::buffer_info {
-//                return py::buffer_info(
-//                        m...data(),                               /* Pointer to buffer */
-//                        sizeof(float),                          /* Size of one scalar */
-//                        py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
-//                        2,                                      /* Number of dimensions */
-//                        { m.rows(), m.cols() },                 /* Buffer dimensions */
-//                        { sizeof(float) * m.cols(),             /* Strides (in bytes) for each index */
-//                          sizeof(float) }
-//                );
-//            });
 }
 
 }  // namespace sstceed
