@@ -34,3 +34,9 @@
 # Build
 build/*
 cmake-build-*
+
+# Jetbrains
+.idea
+
+# Python
+__pycache__

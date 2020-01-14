@@ -34,10 +34,10 @@ public:
 
     size_t GetPacketSize() const { return packet_size_; }
 
-    uint8_t* GetWaveformPointer(uint16_t waveform_index) {
-        uint16_t index = 2 * PACKET_HEADER_WORDS + waveform_index * GetWaveformNBytes();
-        return &packet_[index];
-    }
+//    uint8_t* GetWaveformPointer(uint16_t waveform_index) {
+//        uint16_t index = 2 * PACKET_HEADER_WORDS + waveform_index * GetWaveformNBytes();
+//        return &packet_[index];
+//    }
 
     // Bit-shifting to extract values from packet_______________________________
 
@@ -114,6 +114,10 @@ public:
         return GetNWaveforms() *
                (GetNBuffers() * SAMPLES_PER_WAVEFORM_BLOCK + 2) +
                2 * (PACKET_HEADER_WORDS + PACKET_FOOTER_WORDS);
+    }
+
+    uint16_t GetWaveformStart(uint16_t waveform_index) {
+      return 2 * PACKET_HEADER_WORDS + waveform_index * GetWaveformNBytes();
     }
 
     static uint16_t CalculatePacketSizeBytes(uint16_t n_samples_per_waveform,
