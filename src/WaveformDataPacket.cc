@@ -1,10 +1,10 @@
 // Copyright 2019 Cherenkov Telescope Array Observatory
 // This software is distributed under the terms of the BSD-3-Clause license.
 
-#include "sstCEED/WaveformDataPacket.h"
+#include "sstcam/interfaces/WaveformDataPacket.h"
 
-namespace cta {
-namespace sstceed {
+namespace sstcam {
+namespace interfaces {
 
 uint64_t WaveformDataPacket::GetTACKTime() const {
     return (static_cast<uint64_t>(packet_[12]) << 56u) |
@@ -54,5 +54,5 @@ bool WaveformDataPacket::IsValid() {
 }
 
 
-}  // namespace sstceed
-}  // namespace cta
+}  // namespace interfaces
+}  // namespace sstcam

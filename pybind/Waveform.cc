@@ -1,11 +1,11 @@
 // Copyright 2019 Cherenkov Telescope Array Observatory
 // This software is distributed under the terms of the BSD-3-Clause license.
 
-#include "sstCEED/Waveform.h"
+#include "sstcam/interfaces/Waveform.h"
 #include <pybind11/pybind11.h>
 
-namespace cta {
-namespace sstceed {
+namespace sstcam {
+namespace interfaces {
 
 namespace py = pybind11;
 
@@ -26,5 +26,5 @@ void waveform(py::module &m) {
     waveform.def("GetPixelID", &Waveform::GetPixelID);
 }
 
-}  // namespace sstceed
-}  // namespace cta
+}  // namespace interfaces
+}  // namespace sstcam

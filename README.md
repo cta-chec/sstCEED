@@ -1,2 +1,5 @@
-# sstCEED - SST Camera Event Encoding Definitions
-Low-level library describing the internal data structures and mappings for TARGET modules and the SST camera
+# sstcam-interfaces
+
+Low-level library to handle the interfaces between camera and software. This 
+contents of this package include:
+    - Serialization and deserialization of data packets

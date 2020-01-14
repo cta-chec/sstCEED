@@ -1,10 +1,10 @@
 // Copyright 2019 Cherenkov Telescope Array Observatory
 // This software is distributed under the terms of the BSD-3-Clause license.
 
-#include "sstCEED/Waveform.h"
+#include "sstcam/interfaces/Waveform.h"
 
-namespace cta {
-namespace sstceed {
+namespace sstcam {
+namespace interfaces {
 
 uint16_t Waveform::GetSample12bit(uint16_t sample_index) const {
     uint16_t first_part = static_cast<uint16_t>(
@@ -32,5 +32,5 @@ void Waveform::SetSample16bit(uint16_t sample_index, uint16_t value) {
     waveform_[3 + 2 * sample_index] = (value & 0xFFu);
 }
 
-}  // namespace sstceed
-}  // namespace cta
+}  // namespace interfaces
+}  // namespace sstcam
