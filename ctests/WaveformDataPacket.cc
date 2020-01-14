@@ -1,15 +1,15 @@
 // Copyright 2019 Cherenkov Telescope Array Observatory
 // This software is distributed under the terms of the BSD-3-Clause license.
 
-#include "sstCEED/WaveformDataPacket.h"
+#include "sstcam/interfaces/WaveformDataPacket.h"
 #include "doctest.h"
 #include <fstream>
 
-namespace cta {
-namespace sstceed {
+namespace sstcam {
+namespace interfaces {
 
 TEST_CASE("WaveformDataPacket") {
-    std::string path = "../share/sstCEED/waveform_data_packet_example.bin";
+    std::string path = "../share/sstcam/interfaces/waveform_data_packet_example.bin";
     size_t packet_size = 8276;
     std::ifstream file (path, std::ios::in | std::ios::binary);
     CHECK(file.is_open());
@@ -107,5 +107,5 @@ TEST_CASE("WaveformDataPacket") {
     }
 }
 
-}  // namespace sstceed
-}  // namespace cta
+}  // namespace interfaces
+}  // namespace sstcam

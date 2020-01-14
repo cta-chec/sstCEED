@@ -1,15 +1,15 @@
 // Copyright 2019 Cherenkov Telescope Array Observatory
 // This software is distributed under the terms of the BSD-3-Clause license.
 
-#ifndef SSTCEED_WAVEFORM_H
-#define SSTCEED_WAVEFORM_H
+#ifndef SSTCAM_INTERFACES_WAVEFORM_H
+#define SSTCAM_INTERFACES_WAVEFORM_H
 
-#include "sstCEED/WaveformDataPacket.h"
+#include "sstcam/interfaces/WaveformDataPacket.h"
 #include <cstdint>
 #include <iostream>
 
-namespace cta {
-namespace sstceed {
+namespace sstcam {
+namespace interfaces {
 
 constexpr uint8_t CHANNELS_PER_ASIC = 16;
 
@@ -61,8 +61,8 @@ private:
     uint8_t* waveform_ = nullptr; // Memory owned by WaveformDataPacket
 
 };
-}  // namespace sstceed
-}  // namespace cta
+}  // namespace interfaces
+}  // namespace sstcam
 
 
-#endif //SSTCEED_WAVEFORM_H
+#endif //SSTCAM_INTERFACES_WAVEFORM_H

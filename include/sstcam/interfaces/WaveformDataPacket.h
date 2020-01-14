@@ -3,14 +3,14 @@
 
 //  #define PERFORM_CRC_CHECK
 
-#ifndef SSTCEED_WAVEFORMDATAPACKET_H
-#define SSTCEED_WAVEFORMDATAPACKET_H
+#ifndef SSTCAM_INTERFACES_WAVEFORMDATAPACKET_H
+#define SSTCAM_INTERFACES_WAVEFORMDATAPACKET_H
 
 #include <cstdint>
 #include <iostream>
 
-namespace cta {
-namespace sstceed {
+namespace sstcam {
+namespace interfaces {
 
 constexpr uint8_t SAMPLES_PER_WAVEFORM_BLOCK = 32;
 constexpr uint8_t PACKET_HEADER_WORDS = 8;
@@ -136,8 +136,8 @@ private:
     size_t packet_size_;
 
 };
-}  // namespace sstceed
-}  // namespace cta
+}  // namespace interfaces
+}  // namespace sstcam
 
 
-#endif //SSTCEED_WAVEFORMDATAPACKET_H
+#endif //SSTCAM_INTERFACES_WAVEFORMDATAPACKET_H

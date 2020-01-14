@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.11...3.16)
 
-project(sstCEED VERSION 1.0 LANGUAGES CXX)
-set(LIBTARGET ${PROJECT_NAME}c)
+project(sstcam_interfaces VERSION 1.0 LANGUAGES CXX)
+set(LIBTARGET ${PROJECT_NAME}_c)
 set(PYTARGET ${PROJECT_NAME})
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -23,7 +23,7 @@ endif()
 include(CTest)
 
 # src
-set(HEADER_LIST include/sstCEED/WaveformDataPacket.h)
+set(HEADER_LIST include/sstcam/interfaces/WaveformDataPacket.h)
 add_library(${LIBTARGET} SHARED src/WaveformDataPacket.cc src/Waveform.cc ${HEADER_LIST})
 target_include_directories(${LIBTARGET} PUBLIC include)
 target_compile_features(${LIBTARGET} PUBLIC cxx_std_11)
@@ -51,8 +51,8 @@ target_include_directories(test_Waveform PUBLIC ctests)
 target_compile_features(test_Waveform PRIVATE cxx_std_11)
 
 # data files
-file(GLOB DATA_FILES "${CMAKE_CURRENT_SOURCE_DIR}/share/${PROJECT_NAME}/*")
-file(COPY ${DATA_FILES} DESTINATION ${CMAKE_BINARY_DIR}/share/${PROJECT_NAME}/)
+file(GLOB DATA_FILES "${CMAKE_CURRENT_SOURCE_DIR}/share/sstcam/interfaces/*")
+file(COPY ${DATA_FILES} DESTINATION ${CMAKE_BINARY_DIR}/share/sstcam/interfaces/)
 install(DIRECTORY "${CMAKE_BINARY_DIR}/share" DESTINATION .)
 
 # Compilation options

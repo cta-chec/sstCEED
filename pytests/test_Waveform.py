@@ -1,13 +1,13 @@
 import pytest
 import numpy as np
 from os.path import join, dirname, abspath
-from sstCEED import WaveformDataPacket, Waveform
+from sstcam_interfaces import WaveformDataPacket, Waveform
 
 
 @pytest.fixture(scope='module')
 def packet():
     directory = abspath(dirname(__file__))
-    path = join(directory, "../share/sstCEED/waveform_data_packet_example.bin")
+    path = join(directory, "../share/sstcam/interfaces/waveform_data_packet_example.bin")
     return np.fromfile(path, dtype=np.uint8)
 
 

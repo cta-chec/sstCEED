@@ -3,18 +3,18 @@
 
 #include <pybind11/pybind11.h>
 
-namespace cta {
-namespace sstceed {
+namespace sstcam {
+namespace interfaces {
 
 namespace py = pybind11;
 
 void waveform_data_packet(py::module &m);
 void waveform(py::module &m);
 
-PYBIND11_MODULE(sstCEED, m) {
+PYBIND11_MODULE(sstcam_interfaces, m) {
     waveform_data_packet(m);
     waveform(m);
 }
 
-}  // namespace sstceed
-}  // namespace cta
+}  // namespace interfaces
+}  // namespace sstcam
