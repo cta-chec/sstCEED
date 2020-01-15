@@ -9,6 +9,7 @@
 #include <string>
 #include <cstdint>
 #include <iostream>
+#include <memory>
 
 namespace sstcam {
 namespace interfaces {
@@ -43,14 +44,14 @@ public:
     // Bit-shifting to extract values from packet_______________________________
 
     uint16_t GetNWaveforms() const { return packet_[0] & 0x7Fu; }
-    uint8_t GetRegisterSetup() const { 
-        return static_cast<uint8_t>(packet_[0] >> 7u) & 0x1u; 
+    uint8_t GetRegisterSetup() const {
+        return static_cast<uint8_t>(packet_[0] >> 7u) & 0x1u;
     }
 
     bool IsLastSubPacket() const { return packet_[1] & 0x1u; }
     bool IsFirstSubPacket() const { return packet_[1] & 0x2u; }
     uint16_t GetNBuffers() const {
-        return static_cast<uint8_t>(packet_[1] >> 2u) & 0x3Fu ; 
+        return static_cast<uint8_t>(packet_[1] >> 2u) & 0x3Fu ;
     }
 
     uint64_t GetTACKTime() const;
@@ -70,8 +71,8 @@ public:
     uint8_t GetDetectorUniqueTag() const { return packet_[7]; }
 
     uint8_t GetColumn() const { return packet_[14] & 0x3Fu; }
-    uint8_t GetStaleBit() const { 
-        return static_cast<uint8_t>(packet_[14] >> 6u) & 0x1u; 
+    uint8_t GetStaleBit() const {
+        return static_cast<uint8_t>(packet_[14] >> 6u) & 0x1u;
     }
     bool IsZeroSupressionEnabled() const { return packet_[14] & 0x80u; }
 
