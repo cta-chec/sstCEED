@@ -1,4 +1,8 @@
-# sstcam-interfaces
+# sstcam-base
+
+Base libraries for the SST camera
+
+## sstcam.base.interfaces
 
 Low-level library to handle the interfaces between camera and software. This 
 contents of this package include:
