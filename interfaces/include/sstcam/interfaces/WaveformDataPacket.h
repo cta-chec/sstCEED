@@ -6,6 +6,7 @@
 #ifndef SSTCAM_INTERFACES_WAVEFORMDATAPACKET_H
 #define SSTCAM_INTERFACES_WAVEFORMDATAPACKET_H
 
+#include <string>
 #include <cstdint>
 #include <iostream>
 
