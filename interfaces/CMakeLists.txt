@@ -39,7 +39,7 @@ source_group(TREE "${PROJECT_SOURCE_DIR}/include" PREFIX "Header Files" FILES ${
 # pybind
 pybind11_add_module(${PYTARGET} pybind/module.cc pybind/WaveformDataPacket.cc pybind/Waveform.cc)
 target_link_libraries(${PYTARGET} PRIVATE ${LIBTARGET})
-install(TARGETS ${PYTARGET} EXPORT sstcam-base-targets LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES})
+install(TARGETS ${PYTARGET} LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES})
 
 # ctests
 add_library(test_main OBJECT ctests/test_main.cc)
@@ -65,3 +65,10 @@ install(DIRECTORY "${CMAKE_BINARY_DIR}/share" DESTINATION .)
 target_compile_options(${LIBTARGET} PUBLIC -O2 -Wall -pedantic -Werror -Wextra)
 
 
+# Python stuff
+# Creating a symlink to the python package
+ADD_CUSTOM_TARGET(${PYTARGET}_PACKAGE ALL
+                  COMMAND ${CMAKE_COMMAND} -E create_symlink "${PROJECT_SOURCE_DIR}/python/" "${PYTHON_PACKAGE_PATH}/interfaces")
+# Creating a symlink to the python extension in the main python package directory tree
+add_custom_target(${PYTARGET}_TARGET ALL
+                  COMMAND ${CMAKE_COMMAND} -E create_symlink "$<TARGET_FILE:${PYTARGET}>" "${PYTHON_EXTENSIONS_PATH}/${PYTARGET}")
