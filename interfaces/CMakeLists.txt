@@ -14,6 +14,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Dependencies
 find_package(pybind11 REQUIRED)
 find_package(Doxygen)
+
 # if(Doxygen_FOUND)
 #     add_subdirectory(docs)
 # else()
@@ -25,15 +26,20 @@ include(CTest)
 # src
 set(HEADER_LIST include/sstcam/interfaces/WaveformDataPacket.h include/sstcam/interfaces/Waveform.h)
 add_library(${LIBTARGET} SHARED src/WaveformDataPacket.cc src/Waveform.cc ${HEADER_LIST})
-target_include_directories(${LIBTARGET} PUBLIC include)
+target_include_directories(${LIBTARGET} PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
+    $<INSTALL_INTERFACE:include/>
+    )
 target_compile_features(${LIBTARGET} PUBLIC cxx_std_11)
+install (TARGETS ${LIBTARGET} EXPORT sstcam-base-targets LIBRARY DESTINATION lib)
+
+# Makes it easier for IDEs to find all headers
 source_group(TREE "${PROJECT_SOURCE_DIR}/include" PREFIX "Header Files" FILES ${HEADER_LIST})
-install (TARGETS ${LIBTARGET} LIBRARY DESTINATION lib)
 
 # pybind
 pybind11_add_module(${PYTARGET} pybind/module.cc pybind/WaveformDataPacket.cc pybind/Waveform.cc)
 target_link_libraries(${PYTARGET} PRIVATE ${LIBTARGET})
-install(TARGETS ${PYTARGET} LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES})
+install(TARGETS ${PYTARGET} EXPORT sstcam-base-targets LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES})
 
 # ctests
 add_library(test_main OBJECT ctests/test_main.cc)
@@ -57,3 +63,5 @@ install(DIRECTORY "${CMAKE_BINARY_DIR}/share" DESTINATION .)
 
 # Compilation options
 target_compile_options(${LIBTARGET} PUBLIC -O2 -Wall -pedantic -Werror -Wextra)
+
+
