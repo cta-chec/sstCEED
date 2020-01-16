@@ -67,8 +67,7 @@ target_compile_options(${LIBTARGET} PUBLIC -O2 -Wall -pedantic -Werror -Wextra)
 
 # Python stuff
 # Creating a symlink to the python package
-ADD_CUSTOM_TARGET(${PYTARGET}_PACKAGE ALL
+add_custom_command(TARGET ${PYTARGET} POST_BUILD
                   COMMAND ${CMAKE_COMMAND} -E create_symlink "${PROJECT_SOURCE_DIR}/python/" "${PYTHON_PACKAGE_PATH}/interfaces")
 # Creating a symlink to the python extension in the main python package directory tree
-add_custom_target(${PYTARGET}_TARGET ALL
-                  COMMAND ${CMAKE_COMMAND} -E create_symlink "$<TARGET_FILE:${PYTARGET}>" "${PYTHON_EXTENSIONS_PATH}/${PYTARGET}")
+add_custom_command(TARGET ${PYTARGET} POST_BUILD COMMAND ${CMAKE_COMMAND} -E create_symlink "$<TARGET_FILE:${PYTARGET}>" "${PYTHON_EXTENSIONS_PATH}/${PYTARGET}")
