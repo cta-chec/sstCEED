@@ -127,7 +127,9 @@ public:
 
     static uint16_t CalculateCellID(uint16_t row, uint16_t column, uint16_t blockphase);
 
-    static void CalculateRowColumnBlockPhase(const uint16_t cell_id,
+    uint16_t GetFirstCellID() { return CalculateCellID(GetRow(), GetColumn(), GetBlockPhase()); }
+
+    static void CalculateRowColumnBlockPhase(uint16_t cell_id,
             uint16_t& row, uint16_t& column, uint16_t& blockphase);
 
     // Check if the packet is valid / consistent
