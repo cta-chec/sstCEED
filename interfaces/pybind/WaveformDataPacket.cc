@@ -21,8 +21,10 @@ public:
 };
 
 void waveform_data_packet(py::module &m) {
+    // Enable the passing of the python-wrapped object back to C++
     py::class_<WaveformDataPacket> datapacketbase(m, "_WaveformDataPacket");
     py::class_<WaveformDataPacketPy, WaveformDataPacket> datapacket(m, "WaveformDataPacket");
+
     datapacket.def(py::init<size_t>());
     datapacket.def("GetDataPacket", &WaveformDataPacketPy::GetDataPacketBuffer, py::return_value_policy::reference_internal);
     datapacket.def("GetPacketSize", &WaveformDataPacketPy::GetPacketSize);
