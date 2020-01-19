@@ -9,7 +9,7 @@ namespace sstcam {
 namespace interfaces {
 
 TEST_CASE("WaveformDataPacket") {
-    std::string path = "../share/sstcam/interfaces/waveform_data_packet_example.bin";
+    std::string path = "../../share/sstcam/interfaces/waveform_data_packet_example.bin";
     size_t packet_size = 8276;
     std::ifstream file (path, std::ios::in | std::ios::binary);
     CHECK(file.is_open());
@@ -75,6 +75,8 @@ TEST_CASE("WaveformDataPacket") {
         CHECK(row_0 == row);
         CHECK(column_0 == column);
         CHECK(blockphase_0 == blockphase);
+
+        CHECK(packet.GetFirstCellID() == packet.CalculateCellID(5, 5, 8));
     }
 
     SUBCASE("Valid") {

@@ -10,7 +10,7 @@ namespace sstcam {
 namespace interfaces {
 
 TEST_CASE("Waveform") {
-    std::string path = "../share/sstcam/interfaces/waveform_data_packet_example.bin";
+    std::string path = "../../share/sstcam/interfaces/waveform_data_packet_example.bin";
     size_t packet_size = 8276;
     std::ifstream file (path, std::ios::in | std::ios::binary);
     CHECK(file.is_open());
