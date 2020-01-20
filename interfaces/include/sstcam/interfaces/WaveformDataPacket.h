@@ -36,11 +36,6 @@ public:
 
     size_t GetPacketSize() const { return packet_size_; }
 
-//    uint8_t* GetWaveformPointer(uint16_t waveform_index) {
-//        uint16_t index = 2 * PACKET_HEADER_WORDS + waveform_index * GetWaveformNBytes();
-//        return &packet_[index];
-//    }
-
     // Bit-shifting to extract values from packet_______________________________
 
     uint16_t GetNWaveforms() const { return packet_[0] & 0x7Fu; }
@@ -118,6 +113,7 @@ public:
                2 * (PACKET_HEADER_WORDS + PACKET_FOOTER_WORDS);
     }
 
+    // Get the index within the byte array where a waveform begins
     uint16_t GetWaveformStart(uint16_t waveform_index) {
       return 2 * PACKET_HEADER_WORDS + waveform_index * GetWaveformNBytes();
     }

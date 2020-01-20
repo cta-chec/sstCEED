@@ -23,9 +23,13 @@ public:
     Waveform() = default;
     ~Waveform() = default;
 
+    void Associate(WaveformDataPacket* packet, uint16_t waveform_index) {
+        uint16_t waveform_start = packet->GetWaveformStart(waveform_index);
+        waveform_ = &(packet->GetDataPacket()[waveform_start]);
+    }
+
     void Associate(WaveformDataPacket& packet, uint16_t waveform_index) {
-      uint16_t waveform_start = packet.GetWaveformStart(waveform_index);
-      waveform_ = &packet.GetDataPacket()[waveform_start];
+        Associate(&packet, waveform_index);
     }
 
     bool IsAssociated() { return waveform_; }
