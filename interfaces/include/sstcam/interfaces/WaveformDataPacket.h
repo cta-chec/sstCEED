@@ -26,10 +26,32 @@ constexpr uint8_t WAVEFORM_HEADER_WORDS = 1;
 class WaveformDataPacket {
 public:
     explicit WaveformDataPacket(size_t packet_size)
-            : packet_(new uint8_t[packet_size]()),
+            : packet_(std::make_unique<uint8_t[]>(packet_size)),
               packet_size_(packet_size) {}
 
     ~WaveformDataPacket() = default;
+
+    // Move constructor
+    WaveformDataPacket(WaveformDataPacket&& a) noexcept
+        : packet_size_(a.packet_size_)
+    {
+        packet_ = std::move(a.packet_);
+        a.packet_ = nullptr;
+    }
+
+    // Move assignment
+    WaveformDataPacket& operator=(WaveformDataPacket&& a) noexcept
+    {
+        // Self-assignment detection
+        if (&a == this)
+            return *this;
+
+        // Transfer ownership
+        packet_ = std::move(a.packet_);
+        a.packet_ = nullptr;
+
+        return *this;
+    }
 
     // Get a reference to the packet_ pointer for filling
     uint8_t* GetDataPacket() { return packet_.get(); }
