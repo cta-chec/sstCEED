@@ -52,6 +52,18 @@ TEST_CASE("Waveform") {
         CHECK(waveform.GetSample12bit(0) != 65000); // Overflow
         CHECK(waveform.GetSample16bit(0) == 65000);
     }
+
+    SUBCASE("Consistency") {
+        Waveform waveform;
+        waveform.Associate(packet, 0);
+        uint16_t n_samples = waveform.GetNSamples();
+        for (unsigned short iwav = 0; iwav < packet.GetNWaveforms(); iwav++) {
+            waveform.Associate(packet, iwav);
+            waveform.Print();
+            std::cout << '\n';
+            CHECK(waveform.GetNSamples() == n_samples);
+        }
+    }
 }
 
 }  // namespace interfaces
