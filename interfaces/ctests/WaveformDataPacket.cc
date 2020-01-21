@@ -25,8 +25,10 @@ TEST_CASE("WaveformDataPacket") {
         WaveformDataPacket packet(packet_size);
         CHECK(packet.GetPacketSize() == packet_size);
         REQUIRE(packet.GetDataPacket()[0] == 0);
+        CHECK(packet.IsEmpty());
         file.read(reinterpret_cast<char*>(packet.GetDataPacket()), packet_size);
         CHECK(packet.GetDataPacket()[0] == 32);
+        CHECK(!packet.IsEmpty());
     }
 
     SUBCASE("Getters") {
@@ -77,6 +79,7 @@ TEST_CASE("WaveformDataPacket") {
         CHECK(blockphase_0 == blockphase);
 
         CHECK(packet.GetFirstCellID() == packet.CalculateCellID(5, 5, 8));
+        CHECK(packet.GetFirstCellID() == 1448);
     }
 
     SUBCASE("Valid") {

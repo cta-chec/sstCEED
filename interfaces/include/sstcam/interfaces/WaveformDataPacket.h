@@ -131,6 +131,13 @@ public:
     // Check if the packet is valid / consistent
     bool IsValid();
 
+    bool IsEmpty() {
+        for (size_t i=0; i<packet_size_; i++) {
+            if (packet_[i] != 0) return false;
+        }
+        return true;
+    }
+
 private:
     std::unique_ptr<uint8_t[]> packet_; // Memory owned by class
     size_t packet_size_;
