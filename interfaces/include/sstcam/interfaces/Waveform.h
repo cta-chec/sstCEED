@@ -61,10 +61,23 @@ public:
         return GetASICID() * CHANNELS_PER_ASIC + GetChannelID();
     }
 
+    void Print() {
+        std::cout << "WAVEFORM"
+        << '\n' << "Address: " << (void*) waveform_
+        << '\n' << "IsAssociated: " << IsAssociated()
+        << '\n' << "IsErrorFlagOn: " << IsErrorFlagOn()
+        << '\n' << "GetChannelID: " << static_cast<uint16_t>(GetChannelID())
+        << '\n' << "GetASICID: " << static_cast<uint16_t>(GetASICID())
+        << '\n' << "GetNSamples: " << GetNSamples()
+        << '\n' << "IsZeroSuppressed: " << IsZeroSuppressed()
+        << '\n' << "GetPixelID: " << GetPixelID()
+        << std::endl;
+    }
+
 private:
     uint8_t* waveform_ = nullptr; // Memory owned by WaveformDataPacket
-
 };
+
 }  // namespace interfaces
 }  // namespace sstcam
 
