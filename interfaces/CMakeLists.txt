@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.11...3.16)
 project(sstcam_interfaces VERSION 1.0 LANGUAGES CXX)
 set(LIBTARGET ${PROJECT_NAME}_c)
 set(PYTARGET ${PROJECT_NAME})
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -24,8 +24,8 @@ find_package(Doxygen)
 include(CTest)
 
 # src
-set(HEADER_LIST include/sstcam/interfaces/WaveformDataPacket.h include/sstcam/interfaces/Waveform.h)
-add_library(${LIBTARGET} SHARED src/WaveformDataPacket.cc src/Waveform.cc ${HEADER_LIST})
+set(HEADER_LIST include/sstcam/interfaces/WaveformDataPacket.h include/sstcam/interfaces/Waveform.h include/sstcam/interfaces/WaveformEvent.h)
+add_library(${LIBTARGET} SHARED src/WaveformDataPacket.cc src/Waveform.cc src/WaveformEvent.cc ${HEADER_LIST})
 target_include_directories(${LIBTARGET} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>
     $<INSTALL_INTERFACE:include/>
@@ -37,7 +37,7 @@ install (TARGETS ${LIBTARGET} EXPORT sstcam-base-targets LIBRARY DESTINATION lib
 source_group(TREE "${PROJECT_SOURCE_DIR}/include" PREFIX "Header Files" FILES ${HEADER_LIST})
 
 # pybind
-pybind11_add_module(${PYTARGET} pybind/module.cc pybind/WaveformDataPacket.cc pybind/Waveform.cc)
+pybind11_add_module(${PYTARGET} pybind/module.cc pybind/WaveformDataPacket.cc pybind/Waveform.cc pybind/WaveformEvent.cc)
 target_link_libraries(${PYTARGET} PRIVATE ${LIBTARGET})
 install(TARGETS ${PYTARGET} LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES})
 
@@ -55,6 +55,12 @@ add_test(NAME test_Waveform COMMAND test_Waveform)
 target_link_libraries(test_Waveform ${LIBTARGET})
 target_include_directories(test_Waveform PUBLIC ctests)
 target_compile_features(test_Waveform PRIVATE cxx_std_11)
+
+add_executable(test_WaveformEvent ctests/WaveformEvent.cc $<TARGET_OBJECTS:test_main>)
+add_test(NAME test_WaveformEvent COMMAND test_WaveformEvent)
+target_link_libraries(test_WaveformEvent ${LIBTARGET})
+target_include_directories(test_WaveformEvent PUBLIC ctests)
+target_compile_features(test_WaveformEvent PRIVATE cxx_std_11)
 
 # data files
 file(GLOB DATA_FILES "${CMAKE_CURRENT_SOURCE_DIR}/share/sstcam/interfaces/*")
