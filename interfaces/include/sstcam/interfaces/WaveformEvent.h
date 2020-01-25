@@ -81,6 +81,11 @@ struct WaveformEvent {
 
     virtual ~WaveformEvent() = default;
 
+    // Move constructor
+    WaveformEvent(WaveformEvent&& a) noexcept {
+        packets = std::move(a.packets);
+    }
+
     virtual T GetSample(Waveform& wf, uint16_t isam) const = 0;
 
     void SetEventHeaderFromPackets() {
