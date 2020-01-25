@@ -53,3 +53,12 @@ def test_getters(packet):
     assert data_packet.GetWaveformNBytes() == 258
     assert data_packet.GetWaveformStart(0) == 16
     assert data_packet.GetPacketNBytes() == 8276
+
+
+def test_same_memory():
+    data_packet = WaveformDataPacket(8276)
+    values = data_packet.GetDataPacket()
+    assert values[0] == 0
+
+    values[0] = 12
+    assert data_packet.GetDataPacket()[0] == 12
