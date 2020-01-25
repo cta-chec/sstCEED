@@ -90,7 +90,6 @@ struct WaveformEvent {
 
     void SetEventHeaderFromPackets() {
         for (WaveformDataPacket &packet : packets) {
-            std::cout << packet.IsEmpty() << std::endl;
             if (!packet.IsEmpty()) {
                 first_cell_id = packet.GetFirstCellID();
                 tack = packet.GetTACKTime();
