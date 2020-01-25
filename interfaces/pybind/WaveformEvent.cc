@@ -25,6 +25,7 @@ void waveform_run_header(py::module &m) {
     header.def_readwrite("scale", &WaveformRunHeader::scale);
     header.def_readwrite("offset", &WaveformRunHeader::offset);
     header.def_readwrite("first_module_slot", &WaveformRunHeader::first_module_slot);
+    header.def_readwrite("active_modules", &WaveformRunHeader::active_modules);
 }
 
 template<typename T, typename TT>

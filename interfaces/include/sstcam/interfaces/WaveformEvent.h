@@ -31,9 +31,10 @@ struct WaveformRunHeader {
     float scale;
     float offset;
     uint8_t first_module_slot;
+    std::set<uint8_t> active_modules;
 
     WaveformRunHeader(size_t n_packets_per_event, size_t packet_size,
-        std::set<uint8_t>& active_module_slots, size_t n_samples,
+        std::set<uint8_t>& active_modules, size_t n_samples,
         bool is_r1=false, float scale=1, float offset=0);
 };
 

@@ -7,7 +7,7 @@ namespace sstcam {
 namespace interfaces {
 
 WaveformRunHeader::WaveformRunHeader(size_t n_packets_per_event, size_t packet_size,
-    std::set<uint8_t>& active_module_slots, size_t n_samples,
+    std::set<uint8_t>& active_modules, size_t n_samples,
     bool is_r1, float scale, float offset)
         : n_packets_per_event(n_packets_per_event),
           packet_size(packet_size),
@@ -15,9 +15,10 @@ WaveformRunHeader::WaveformRunHeader(size_t n_packets_per_event, size_t packet_s
           is_r1(is_r1),
           scale(scale),
           offset(offset),
-          first_module_slot(*active_module_slots.begin())
+          first_module_slot(*active_modules.begin()),
+          active_modules(active_modules)
 {
-    size_t n_modules_in_file = active_module_slots.size();
+    size_t n_modules_in_file = active_modules.size();
     size_t n_modules;
 
     // Hardcoded n_module situations
