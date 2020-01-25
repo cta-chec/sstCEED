@@ -23,16 +23,16 @@ public:
     Waveform() = default;
     ~Waveform() = default;
 
-    void Associate(WaveformDataPacket* packet, uint16_t waveform_index) {
+    void Associate(const WaveformDataPacket* packet, uint16_t waveform_index) {
         uint16_t waveform_start = packet->GetWaveformStart(waveform_index);
         waveform_ = &(packet->GetDataPacket()[waveform_start]);
     }
 
-    void Associate(WaveformDataPacket& packet, uint16_t waveform_index) {
+    void Associate(const WaveformDataPacket& packet, uint16_t waveform_index) {
         Associate(&packet, waveform_index);
     }
 
-    bool IsAssociated() { return waveform_; }
+    bool IsAssociated() const { return waveform_; }
 
     bool IsErrorFlagOn() const { return waveform_[0] & 0x1u; }
     uint8_t GetChannelID() const {
@@ -61,7 +61,7 @@ public:
         return GetASICID() * CHANNELS_PER_ASIC + GetChannelID();
     }
 
-    void Print() {
+    void Print() const {
         std::cout << "WAVEFORM"
         << '\n' << "Address: " << (void*) waveform_
         << '\n' << "IsAssociated: " << IsAssociated()

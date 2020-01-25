@@ -12,7 +12,7 @@ namespace py = pybind11;
 void waveform(py::module &m) {
     py::class_<Waveform> waveform(m, "Waveform");
     waveform.def(py::init<>());
-    waveform.def("Associate", (void (Waveform::*)(WaveformDataPacket&, uint16_t)) &Waveform::Associate);
+    waveform.def("Associate", (void (Waveform::*)(const WaveformDataPacket&, uint16_t)) &Waveform::Associate);
     waveform.def("IsAssociated", &Waveform::IsAssociated);
     waveform.def("IsErrorFlagOn", &Waveform::IsErrorFlagOn);
     waveform.def("GetChannelID", &Waveform::GetChannelID);

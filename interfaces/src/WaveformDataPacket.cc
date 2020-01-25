@@ -37,7 +37,7 @@ void WaveformDataPacket::CalculateRowColumnBlockPhase(const uint16_t cell_id,
     column = (cell_id / SAMPLES_PER_WAVEFORM_BLOCK) / 8u;
 }
 
-bool WaveformDataPacket::IsValid() {
+bool WaveformDataPacket::IsValid() const {
     if (packet_size_ == 0) return false;
     if (packet_size_ != GetPacketNBytes()) return false;
 

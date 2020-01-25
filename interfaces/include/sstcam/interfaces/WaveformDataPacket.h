@@ -54,7 +54,7 @@ public:
     }
 
     // Get a reference to the packet_ pointer for filling
-    uint8_t* GetDataPacket() { return packet_.get(); }
+    uint8_t* GetDataPacket() const { return packet_.get(); }
 
     size_t GetPacketSize() const { return packet_size_; }
 
@@ -106,7 +106,7 @@ public:
 
     uint16_t GetMBZ() const {
         uint16_t first_part = static_cast<uint16_t>(packet_[packet_size_ - 2]) << 6u;
-        uint16_t second_part = static_cast<uint16_t>(packet_[packet_size_ - 1] >> 2u) & 0x3Fu;
+        uint16_t second_part = static_cast<uint16_t>(packet_[packet_size_-1]>>2u) & 0x3Fu;
         return first_part | second_part;
     }
 
@@ -129,14 +129,14 @@ public:
         return GetWaveformSamplesNBytes() + WAVEFORM_HEADER_WORDS*2;
     }
 
-    uint16_t GetPacketNBytes() {
+    uint16_t GetPacketNBytes() const {
         return GetNWaveforms() *
                (GetNBuffers() * SAMPLES_PER_WAVEFORM_BLOCK + 2) +
                2 * (PACKET_HEADER_WORDS + PACKET_FOOTER_WORDS);
     }
 
     // Get the index within the byte array where a waveform begins
-    uint16_t GetWaveformStart(uint16_t waveform_index) {
+    uint16_t GetWaveformStart(uint16_t waveform_index) const {
       return 2 * PACKET_HEADER_WORDS + waveform_index * GetWaveformNBytes();
     }
 
@@ -145,15 +145,17 @@ public:
 
     static uint16_t CalculateCellID(uint16_t row, uint16_t column, uint16_t blockphase);
 
-    uint16_t GetFirstCellID() { return CalculateCellID(GetRow(), GetColumn(), GetBlockPhase()); }
+    uint16_t GetFirstCellID() const {
+        return CalculateCellID(GetRow(), GetColumn(), GetBlockPhase());
+    }
 
     static void CalculateRowColumnBlockPhase(uint16_t cell_id,
             uint16_t& row, uint16_t& column, uint16_t& blockphase);
 
     // Check if the packet is valid / consistent
-    bool IsValid();
+    bool IsValid() const;
 
-    bool IsEmpty() {
+    bool IsEmpty() const {
         for (size_t i=0; i<packet_size_; i++) {
             if (packet_[i] != 0) return false;
         }
