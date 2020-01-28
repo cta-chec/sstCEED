@@ -46,6 +46,7 @@ void waveform_data_packet(py::module &m) {
     datapacket.def("GetWaveformNBytes", &WaveformDataPacket::GetWaveformNBytes);
     datapacket.def("GetWaveformStart", &WaveformDataPacket::GetWaveformStart);
     datapacket.def("GetPacketNBytes", &WaveformDataPacket::GetPacketNBytes);
+    datapacket.def("GetFirstCellID", &WaveformDataPacket::GetFirstCellID);
     datapacket.def("CalculatePacketSizeBytes", &WaveformDataPacket::CalculatePacketSizeBytes);
     datapacket.def("CalculateCellID", &WaveformDataPacket::CalculateCellID);
     datapacket.def("CalculateRowColumnBlockPhase", &WaveformDataPacket::CalculateRowColumnBlockPhase);

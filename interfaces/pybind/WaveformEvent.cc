@@ -12,7 +12,7 @@ namespace interfaces {
 namespace py = pybind11;
 
 void waveform_run_header(py::module &m) {
-    py::class_<WaveformRunHeader> header(m, "WaveformRunHeader");
+    py::class_<WaveformRunHeader, std::shared_ptr<WaveformRunHeader>> header(m, "WaveformRunHeader");
     header.def(py::init<size_t, size_t, std::set<uint8_t>&, size_t>());
     header.def(py::init<size_t, size_t, std::set<uint8_t>&, size_t, bool>());
     header.def(py::init<size_t, size_t, std::set<uint8_t>&, size_t, bool, float>());
@@ -41,7 +41,7 @@ py::array_t<TT> GetWaveforms(const T& waveform_event) {
 template<typename T, typename TT>
 void waveform_event_template(py::module &m, const std::string& name) {
     py::class_<T> waveform_event(m, name.c_str());
-    waveform_event.def(py::init<WaveformRunHeader*>());
+    waveform_event.def(py::init<std::shared_ptr<WaveformRunHeader>>());
     waveform_event.def("GetWaveforms", GetWaveforms<T, TT>);
     waveform_event.def("SetEventHeaderFromPackets", &T::SetEventHeaderFromPackets);
     waveform_event.def_readonly("run_header", &T::run_header);

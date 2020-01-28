@@ -55,10 +55,11 @@ TEST_CASE("WaveformEvent") {
         CHECK(run_header_unknown.n_pixels == 2048+64);
     }
 
-    WaveformRunHeader run_header(n_packets_per_event, packet_size, active_module_slots, n_samples);
+    auto run_header = std::make_shared<WaveformRunHeader>(
+        n_packets_per_event, packet_size, active_module_slots, n_samples);
 
     SUBCASE("WaveformEventR0 Constructor") {
-        WaveformEventR0 event(&run_header);
+        WaveformEventR0 event(run_header);
         CHECK(event.packets.size() == n_packets_per_event);
         CHECK(event.packets[0].IsEmpty());
         std::vector<uint16_t> waveforms = event.GetWaveforms();
@@ -72,7 +73,7 @@ TEST_CASE("WaveformEvent") {
     }
 
     SUBCASE("WaveformEventR1 Constructor") {
-        WaveformEventR1 event(&run_header);
+        WaveformEventR1 event(run_header);
         CHECK(event.packets.size() == n_packets_per_event);
         CHECK(event.packets[0].IsEmpty());
         std::vector<float> waveforms = event.GetWaveforms();
@@ -85,11 +86,11 @@ TEST_CASE("WaveformEvent") {
         CHECK(all_zero);
     }
 
-    WaveformEventR0 event_r0(&run_header);
+    WaveformEventR0 event_r0(run_header);
     file.seekg(0, std::ios::beg);
     file.read(reinterpret_cast<char*>(event_r0.packets[0].GetDataPacket()), packet_size);
 
-    WaveformEventR1 event_r1(&run_header);
+    WaveformEventR1 event_r1(run_header);
     file.seekg(0, std::ios::beg);
     file.read(reinterpret_cast<char*>(event_r1.packets[0].GetDataPacket()), packet_size);
 
@@ -114,8 +115,8 @@ TEST_CASE("WaveformEvent") {
         CHECK(event_r1.GetSample(waveform, 0) == 636.0f);
     }
 
-    run_header.scale = 10;
-    run_header.offset = 3;
+    run_header->scale = 10;
+    run_header->offset = 3;
 
     SUBCASE("WaveformEventR1 Sample Scale&Offset") {
         REQUIRE(event_r0.run_header->scale == 10);

@@ -47,7 +47,7 @@ struct WaveformRunHeader {
  */
 template<typename T>
 struct WaveformEvent {
-    WaveformRunHeader* run_header;
+    std::shared_ptr<WaveformRunHeader> run_header;
     std::vector<WaveformDataPacket> packets;
 
     // WaveformEvent Headers
@@ -63,7 +63,7 @@ struct WaveformEvent {
 
     // TODO: Check difference in tack between header and packet
 
-    explicit WaveformEvent(WaveformRunHeader* run_header)
+    explicit WaveformEvent(std::shared_ptr<WaveformRunHeader> run_header)
         : run_header(run_header),
           index(0),
           first_cell_id(0),
@@ -83,7 +83,15 @@ struct WaveformEvent {
 
     // Move constructor
     WaveformEvent(WaveformEvent&& a) noexcept {
+        run_header = a.run_header;
         packets = std::move(a.packets);
+        index = a.index;
+        first_cell_id = a.first_cell_id;
+        stale = a.stale;
+        missing_packets = a.missing_packets;
+        tack = a.tack;
+        cpu_s = a.cpu_s;
+        cpu_ns = a.cpu_ns;
     }
 
     virtual T GetSample(Waveform& wf, uint16_t isam) const = 0;
@@ -120,7 +128,7 @@ struct WaveformEvent {
 };
 
 struct WaveformEventR0 : WaveformEvent<uint16_t> {
-    explicit WaveformEventR0(WaveformRunHeader* run_header)
+    explicit WaveformEventR0(std::shared_ptr<WaveformRunHeader> run_header)
         : WaveformEvent<uint16_t>(run_header) {}
 
     uint16_t GetSample(Waveform& wf, uint16_t isam) const final {
@@ -129,7 +137,7 @@ struct WaveformEventR0 : WaveformEvent<uint16_t> {
 };
 
 struct WaveformEventR1 : WaveformEvent<float> {
-    explicit WaveformEventR1(WaveformRunHeader* run_header)
+    explicit WaveformEventR1(std::shared_ptr<WaveformRunHeader> run_header)
         : WaveformEvent<float>(run_header) {}
 
     float GetSample(Waveform& wf, uint16_t isam) const final {
