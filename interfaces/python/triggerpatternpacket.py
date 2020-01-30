@@ -249,7 +249,7 @@ class NominalTriggerPacketV1(TriggerPacket):
         # Extracting the triggered phases
         trigg_pattrns = np.unpackbits(
             np.frombuffer(
-                raw_packet[cls._head_form.size: -int(512 / 8) - cls._tail_form.size],
+                raw_packet[cls._head_form.size : -int(512 / 8) - cls._tail_form.size],
                 dtype=np.uint8,
             )
         )
@@ -259,7 +259,7 @@ class NominalTriggerPacketV1(TriggerPacket):
             np.frombuffer(
                 raw_packet[
                     cls._head_form.size
-                    + readout_length * int(512 / 8): -cls._tail_form.size
+                    + readout_length * int(512 / 8) : -cls._tail_form.size
                 ],
                 dtype=np.uint8,
             )
@@ -267,7 +267,7 @@ class NominalTriggerPacketV1(TriggerPacket):
 
         # extracting counters
 
-        tail = cls._tail_form.unpack(raw_packet[-cls._tail_form.size:])
+        tail = cls._tail_form.unpack(raw_packet[-cls._tail_form.size :])
         return cls(*[tack, phase, trigg_pattrns, union] + list(tail))
 
     def pack(self):
@@ -494,7 +494,7 @@ class TriggerPacketV2(TriggerPacket):
 
         # Extracting the triggered phases (trigger pattern readout) in chunks of 8 bits
         trigg_pattrns = np.frombuffer(
-            raw_packet[head_form.size + int(512 / 8):], dtype=np.uint8
+            raw_packet[head_form.size + int(512 / 8) :], dtype=np.uint8
         )
         trigg_pattrns = (
             np.unpackbits(trigg_pattrns).reshape((512, ro_len))
@@ -548,7 +548,7 @@ class TriggerPacketV3(TriggerPacketV2):
 
         union = np.unpackbits(
             np.frombuffer(
-                raw_packet[head_form.size: head_form.size + int(512 / 8)],
+                raw_packet[head_form.size : head_form.size + int(512 / 8)],
                 dtype=np.uint8,
             )
         )

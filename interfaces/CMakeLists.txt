@@ -36,10 +36,9 @@ install (TARGETS ${LIBTARGET} EXPORT sstcam-base-targets LIBRARY DESTINATION lib
 # Makes it easier for IDEs to find all headers
 source_group(TREE "${PROJECT_SOURCE_DIR}/include" PREFIX "Header Files" FILES ${HEADER_LIST})
 
-# pybind
-pybind11_add_module(${PYTARGET} pybind/module.cc pybind/WaveformDataPacket.cc pybind/Waveform.cc pybind/WaveformEvent.cc)
-target_link_libraries(${PYTARGET} PRIVATE ${LIBTARGET})
-install(TARGETS ${PYTARGET} LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES})
+# python_module
+set(PYTHON_SRC pybind/module.cc pybind/WaveformDataPacket.cc pybind/Waveform.cc pybind/WaveformEvent.cc)
+python_module(${PYTARGET} ${LIBTARGET} interfaces "${PYTHON_SRC}")
 
 # ctests
 add_library(test_main OBJECT ctests/test_main.cc)
@@ -70,10 +69,3 @@ install(DIRECTORY "${CMAKE_BINARY_DIR}/share" DESTINATION .)
 # Compilation options
 target_compile_options(${LIBTARGET} PUBLIC -O2 -Wall -pedantic -Werror -Wextra)
 
-
-# Python stuff
-# Creating a symlink to the python package
-add_custom_command(TARGET ${PYTARGET} POST_BUILD
-                  COMMAND ${CMAKE_COMMAND} -E create_symlink "${PROJECT_SOURCE_DIR}/python/" "${PYTHON_PACKAGE_PATH}/interfaces")
-# Creating a symlink to the python extension in the main python package directory tree
-add_custom_command(TARGET ${PYTARGET} POST_BUILD COMMAND ${CMAKE_COMMAND} -E create_symlink "$<TARGET_FILE:${PYTARGET}>" "${PYTHON_EXTENSIONS_PATH}/${PYTARGET}")
