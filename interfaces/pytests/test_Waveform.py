@@ -4,10 +4,12 @@ from os.path import join, dirname, abspath
 from sstcam_interfaces import WaveformDataPacket, Waveform
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def packet():
     directory = abspath(dirname(__file__))
-    path = join(directory, "../share/sstcam/interfaces/waveform_data_packet_example.bin")
+    path = join(
+        directory, "../share/sstcam/interfaces/waveform_data_packet_example.bin"
+    )
     return np.fromfile(path, dtype=np.uint8)
 
 
@@ -60,5 +62,5 @@ def test_last_waveform(packet):
     data_packet = WaveformDataPacket(packet.size)
     data_packet.GetDataPacket()[:] = packet
     waveform = Waveform()
-    waveform.Associate(data_packet, data_packet.GetNWaveforms()-1)
+    waveform.Associate(data_packet, data_packet.GetNWaveforms() - 1)
     assert waveform.GetSample12bit(0) == 649
