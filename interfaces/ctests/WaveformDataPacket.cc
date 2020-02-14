@@ -39,7 +39,7 @@ TEST_CASE("WaveformDataPacket") {
         CHECK(!packet.IsLastSubPacket());
         CHECK(packet.IsFirstSubPacket());
         CHECK(packet.GetNBuffers() == 8);
-        CHECK(packet.GetTACKTime() == 2165717354592);
+        CHECK(packet.GetTACK() == 2165717354592);
         CHECK(packet.GetEventNumber() == 18528);
         CHECK(packet.GetSlotID() == 22);
         CHECK(packet.GetDetectorID() == 22);

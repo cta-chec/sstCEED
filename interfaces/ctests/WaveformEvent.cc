@@ -8,137 +8,181 @@
 namespace sstcam {
 namespace interfaces {
 
+TEST_CASE("GetHardcodedModuleSituation") {
+    std::set<uint8_t> slots = {5};
+    size_t n_pixels = 0;
+    uint8_t first_active_module_slot = 0;
+
+    GetHardcodedModuleSituation(slots, n_pixels, first_active_module_slot);
+    CHECK(n_pixels == 64);
+    CHECK(first_active_module_slot == 5);
+
+
+    slots.insert(4);
+    n_pixels = 0;
+    first_active_module_slot = 0;
+    GetHardcodedModuleSituation(slots, n_pixels, first_active_module_slot);
+    CHECK(n_pixels == 2048);
+    CHECK(first_active_module_slot == 0);
+
+    for (uint8_t slot=0; slot < 32; slot++) {
+        slots.insert(slot);
+        GetHardcodedModuleSituation(slots, n_pixels, first_active_module_slot);
+        CHECK(n_pixels == 2048);
+    }
+
+    slots.insert(32);
+    GetHardcodedModuleSituation(slots, n_pixels, first_active_module_slot);
+    CHECK(n_pixels == 2048+64);
+}
+
 TEST_CASE("WaveformEvent") {
     std::string path = "../../share/sstcam/interfaces/waveform_data_packet_example.bin";
     size_t packet_size = 8276;
     std::ifstream file (path, std::ios::in | std::ios::binary);
     CHECK(file.is_open());
-    WaveformDataPacket packet(packet_size);
-    file.read(reinterpret_cast<char*>(packet.GetDataPacket()), packet_size);
+    auto packet = std::make_shared<WaveformDataPacket>(packet_size);
+    file.read(reinterpret_cast<char*>(packet->GetDataPacket()), packet_size);
 
     size_t n_packets_per_event = 1;
-    std::set<uint8_t> active_module_slots = {packet.GetSlotID()};
-    size_t n_samples = packet.GetWaveformNSamples();
-
-    SUBCASE("WaveformRunHeader") {
-        std::set<uint8_t> slots = {5};
-        WaveformRunHeader run_header_single(n_packets_per_event, packet_size, slots, n_samples);
-        CHECK(run_header_single.n_pixels == 64);
-        CHECK(run_header_single.n_packets_per_event == n_packets_per_event);
-        CHECK(run_header_single.packet_size == packet_size);
-        CHECK(run_header_single.n_samples == n_samples);
-        CHECK(!run_header_single.is_r1);
-        CHECK(run_header_single.scale == 1);
-        CHECK(run_header_single.offset == 0);
-        CHECK(run_header_single.first_module_slot == 5);
-
-        slots.insert(4);
-        WaveformRunHeader run_header_dual(n_packets_per_event, packet_size, slots,
-            n_samples, true, 5, 6);
-        CHECK(run_header_dual.n_pixels == 2048);
-        CHECK(run_header_dual.n_packets_per_event == n_packets_per_event);
-        CHECK(run_header_dual.packet_size == packet_size);
-        CHECK(run_header_dual.n_samples == n_samples);
-        CHECK(run_header_dual.is_r1);
-        CHECK(run_header_dual.scale == 5);
-        CHECK(run_header_dual.offset == 6);
-        CHECK(run_header_dual.first_module_slot == 0);
-
-        for (uint8_t slot=0; slot < 32; slot++) {
-            slots.insert(slot);
-            WaveformRunHeader run_header_camera(n_packets_per_event, packet_size, slots, n_samples);
-            CHECK(run_header_camera.n_pixels == 2048);
-        }
-
-        slots.insert(32);
-        WaveformRunHeader run_header_unknown(n_packets_per_event, packet_size, slots, n_samples);
-        CHECK(run_header_unknown.n_pixels == 2048+64);
-    }
-
-    auto run_header = std::make_shared<WaveformRunHeader>(
-        n_packets_per_event, packet_size, active_module_slots, n_samples);
+    std::set<uint8_t> active_module_slots = {packet->GetSlotID()};
+    size_t n_samples = packet->GetWaveformNSamples();
+    size_t n_pixels;
+    uint8_t first_active_module_slot;
+    GetHardcodedModuleSituation(active_module_slots, n_pixels, first_active_module_slot);
 
     SUBCASE("WaveformEventR0 Constructor") {
-        WaveformEventR0 event(run_header);
-        CHECK(event.packets.size() == n_packets_per_event);
-        CHECK(event.packets[0].IsEmpty());
-        std::vector<uint16_t> waveforms = event.GetWaveforms();
-        bool all_zero = true;
-        for (size_t ipix = 0; ipix < event.run_header->n_pixels; ipix++) {
-            for (size_t isam = 0; isam < event.run_header->n_samples; isam++) {
-                if (waveforms[ipix * n_samples + isam] != 0) all_zero = false;
-            }
-        }
-        CHECK(all_zero);
+        WaveformEventR0 event(n_packets_per_event);
+        CHECK(event.IsEmpty());
     }
 
     SUBCASE("WaveformEventR1 Constructor") {
-        WaveformEventR1 event(run_header);
-        CHECK(event.packets.size() == n_packets_per_event);
-        CHECK(event.packets[0].IsEmpty());
-        std::vector<float> waveforms = event.GetWaveforms();
-        bool all_zero = true;
-        for (size_t ipix = 0; ipix < event.run_header->n_pixels; ipix++) {
-            for (size_t isam = 0; isam < event.run_header->n_samples; isam++) {
-                if (waveforms[ipix * n_samples + isam] != 0) all_zero = false;
-            }
-        }
-        CHECK(all_zero);
+        WaveformEventR1 event(n_packets_per_event);
+        CHECK(event.IsEmpty());
     }
 
-    WaveformEventR0 event_r0(run_header);
-    file.seekg(0, std::ios::beg);
-    file.read(reinterpret_cast<char*>(event_r0.packets[0].GetDataPacket()), packet_size);
+    SUBCASE("WaveformEventR0 Adding Packets") {
+        WaveformEventR0 event(n_packets_per_event);
+        CHECK(event.IsEmpty());
+        CHECK(!event.IsFilled());
+        CHECK(event.GetNPacketsAdded() == 0);
+        CHECK(event.IsMissingPackets());
 
-    WaveformEventR1 event_r1(run_header);
-    file.seekg(0, std::ios::beg);
-    file.read(reinterpret_cast<char*>(event_r1.packets[0].GetDataPacket()), packet_size);
+        event.AddPacket(packet.get());
+        CHECK(!event.IsEmpty());
+        CHECK(event.IsFilled());
+        CHECK(event.GetNPacketsAdded() == 1);
+        CHECK(!event.IsMissingPackets());
 
-    SUBCASE("WaveformEventR0 Headers") {
-        event_r0.SetEventHeaderFromPackets();
-        CHECK(event_r0.index == 0);
-        CHECK(event_r0.first_cell_id == 1448);
-        CHECK(event_r0.tack == 2165717354592);
-        CHECK(!event_r0.stale);
-        CHECK(!event_r0.missing_packets);
+        auto packet_ptr2 = std::make_shared<WaveformDataPacket>(packet_size);
+        event.AddPacket(packet_ptr2.get());
+        CHECK(!event.IsEmpty());
+        CHECK(event.IsFilled());
+        CHECK(event.GetNPacketsAdded() == 1);
+        CHECK(event.GetPackets()[0] == packet.get());
+        CHECK(event.GetPackets()[0] != packet_ptr2.get()); // TODO: remove
+
+        event.Reset();
+        CHECK(event.IsEmpty());
+        CHECK(!event.IsFilled());
+        CHECK(event.GetNPacketsAdded() == 0);
+        CHECK(event.GetPackets()[0] == nullptr);
+        event.AddPacket(packet_ptr2.get());
+        CHECK(!event.IsEmpty());
+        CHECK(event.IsFilled());
+        CHECK(event.GetNPacketsAdded() == 1);
+        CHECK(event.GetPackets()[0] == packet_ptr2.get());
+    }
+
+    SUBCASE("WaveformEventR0 Adding Packets (shared)") {
+        WaveformEventR0 event(n_packets_per_event);
+        CHECK(event.IsEmpty());
+        CHECK(!event.IsFilled());
+        CHECK(event.GetNPacketsAdded() == 0);
+        CHECK(event.IsMissingPackets());
+
+        event.AddPacketShared(packet);
+        CHECK(!event.IsEmpty());
+        CHECK(event.IsFilled());
+        CHECK(event.GetNPacketsAdded() == 1);
+        CHECK(!event.IsMissingPackets());
+
+        auto packet_ptr2 = std::make_shared<WaveformDataPacket>(packet_size);
+        event.AddPacketShared(packet_ptr2);
+        CHECK(!event.IsEmpty());
+        CHECK(event.IsFilled());
+        CHECK(event.GetNPacketsAdded() == 1);
+        CHECK(event.GetPackets()[0] == packet.get());
+        CHECK(event.GetPackets()[0] != packet_ptr2.get()); // TODO: remove
+
+        event.Reset();
+        CHECK(event.IsEmpty());
+        CHECK(!event.IsFilled());
+        CHECK(event.GetNPacketsAdded() == 0);
+        CHECK(event.GetPackets()[0] == nullptr);
+        event.AddPacketShared(packet_ptr2);
+        CHECK(!event.IsEmpty());
+        CHECK(event.IsFilled());
+        CHECK(event.GetNPacketsAdded() == 1);
+        CHECK(event.GetPackets()[0] == packet_ptr2.get());
+    }
+
+    SUBCASE("WaveformEventR0 Owning Packets") {
+        WaveformEventR0 event(n_packets_per_event);
+        auto packet_ptr = std::make_shared<WaveformDataPacket>(packet_size);
+        CHECK(packet_ptr.use_count() == 1);
+        event.AddPacketShared(packet_ptr);
+        CHECK(packet_ptr.use_count() == 2);
+    }
+
+    WaveformEventR0 event_r0(n_packets_per_event, n_pixels, first_active_module_slot);
+    event_r0.AddPacket(packet.get());
+    WaveformEventR1 event_r1(n_packets_per_event, n_pixels, first_active_module_slot);
+    event_r1.AddPacket(packet.get());
+
+    SUBCASE("WaveformEventR0 Metadata") {
+        CHECK(event_r0.GetNPixels() == n_pixels);
+        CHECK(event_r0.GetNSamples() == n_samples);
+        CHECK(event_r0.GetFirstCellID() == 1448);
+        CHECK(event_r0.GetTACK() == 2165717354592);
+        CHECK(!event_r0.IsStale());
+        CHECK(!event_r0.IsMissingPackets());
     }
 
     SUBCASE("WaveformEventR0 Sample") {
         Waveform waveform;
-        waveform.Associate(event_r0.packets[0], event_r0.packets[0].GetWaveformStart(0));
+        WaveformDataPacket* packet_ = event_r0.GetPackets()[0];
+        waveform.Associate(packet_, packet_->GetWaveformStart(0));
         CHECK(event_r0.GetSample(waveform, 0) == 636);
     }
 
     SUBCASE("WaveformEventR1 Sample") {
         Waveform waveform;
-        waveform.Associate(event_r1.packets[0], event_r1.packets[0].GetWaveformStart(0));
+        WaveformDataPacket* packet_ = event_r1.GetPackets()[0];
+        waveform.Associate(packet_, packet_->GetWaveformStart(0));
         CHECK(event_r1.GetSample(waveform, 0) == 636.0f);
     }
 
-    run_header->scale = 10;
-    run_header->offset = 3;
+    WaveformEventR1 event_r1_so(n_packets_per_event, n_pixels, first_active_module_slot, 10, 3);
+    event_r1_so.AddPacket(packet.get());
 
     SUBCASE("WaveformEventR1 Sample Scale&Offset") {
-        REQUIRE(event_r0.run_header->scale == 10);
-        REQUIRE(event_r0.run_header->offset == 3);
-        Waveform waveform;
-        waveform.Associate(event_r0.packets[0], event_r0.packets[0].GetWaveformStart(0));
-        CHECK(event_r0.GetSample(waveform, 0) == 636);
-    }
+        REQUIRE(event_r1.GetScale() == 1);
+        REQUIRE(event_r1.GetOffset() == 0);
 
-    SUBCASE("WaveformEventR1 Sample Scale&Offset") {
-        REQUIRE(event_r1.run_header->scale == 10);
-        REQUIRE(event_r1.run_header->offset == 3);
+        REQUIRE(event_r1_so.GetScale() == 10);
+        REQUIRE(event_r1_so.GetOffset() == 3);
         Waveform waveform;
-        waveform.Associate(event_r1.packets[0], event_r1.packets[0].GetWaveformStart(0));
-        CHECK(event_r1.GetSample(waveform, 0) == 60.60f);
+        WaveformDataPacket* packet_ = event_r1_so.GetPackets()[0];
+        waveform.Associate(packet_, packet_->GetWaveformStart(0));
+        CHECK(event_r1_so.GetSample(waveform, 0) == 60.60f);
     }
 
     SUBCASE("WaveformEventR0 Waveforms") {
         std::vector<uint16_t> waveforms = event_r0.GetWaveforms();
         bool none_zero = true;
-        for (size_t ipix = 0; ipix < event_r0.run_header->n_pixels; ipix++) {
-            for (size_t isam = 0; isam < event_r0.run_header->n_samples; isam++) {
+        for (size_t ipix = 0; ipix < n_pixels; ipix++) {
+            for (size_t isam = 0; isam < n_samples; isam++) {
                 if (ipix >= 32) continue;
                 if (waveforms[ipix * n_samples + isam] == 0) none_zero = false;
             }
@@ -149,8 +193,8 @@ TEST_CASE("WaveformEvent") {
     SUBCASE("WaveformEventR1 Waveforms") {
         std::vector<float> waveforms = event_r1.GetWaveforms();
         bool none_zero = true;
-        for (size_t ipix = 0; ipix < event_r1.run_header->n_pixels; ipix++) {
-            for (size_t isam = 0; isam < event_r1.run_header->n_samples; isam++) {
+        for (size_t ipix = 0; ipix < n_pixels; ipix++) {
+            for (size_t isam = 0; isam < n_samples; isam++) {
                 if (ipix >= 32) continue;
                 if (waveforms[ipix * n_samples + isam] == 0) none_zero = false;
             }

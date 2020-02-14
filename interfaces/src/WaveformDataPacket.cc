@@ -6,7 +6,7 @@
 namespace sstcam {
 namespace interfaces {
 
-uint64_t WaveformDataPacket::GetTACKTime() const {
+uint64_t WaveformDataPacket::GetTACK() const {
     return (static_cast<uint64_t>(packet_[12]) << 56u) |
            (static_cast<uint64_t>(packet_[13]) << 48u) |
            (static_cast<uint64_t>(packet_[10]) << 40u) |

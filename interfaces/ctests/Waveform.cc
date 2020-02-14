@@ -59,8 +59,6 @@ TEST_CASE("Waveform") {
         uint16_t n_samples = waveform.GetNSamples();
         for (unsigned short iwav = 0; iwav < packet.GetNWaveforms(); iwav++) {
             waveform.Associate(packet, iwav);
-            waveform.Print();
-            std::cout << '\n';
             CHECK(waveform.GetNSamples() == n_samples);
         }
     }

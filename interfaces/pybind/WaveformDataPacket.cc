@@ -25,7 +25,7 @@ void waveform_data_packet(py::module &m) {
     datapacket.def("IsLastSubPacket", &WaveformDataPacket::IsLastSubPacket);
     datapacket.def("IsFirstSubPacket", &WaveformDataPacket::IsFirstSubPacket);
     datapacket.def("GetNBuffers", &WaveformDataPacket::GetNBuffers);
-    datapacket.def("GetTACKTime", &WaveformDataPacket::GetTACKTime);
+    datapacket.def("GetTACK", &WaveformDataPacket::GetTACK);
     datapacket.def("GetEventNumber", &WaveformDataPacket::GetEventNumber);
     datapacket.def("GetSlotID", &WaveformDataPacket::GetSlotID);
     datapacket.def("GetDetectorID", &WaveformDataPacket::GetDetectorID);

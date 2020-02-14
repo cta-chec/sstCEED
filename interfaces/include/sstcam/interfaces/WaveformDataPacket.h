@@ -71,7 +71,7 @@ public:
         return static_cast<uint8_t>(packet_[1] >> 2u) & 0x3Fu ;
     }
 
-    uint64_t GetTACKTime() const;
+    uint64_t GetTACK() const;
     uint16_t GetEventNumber() const {
         return static_cast<uint16_t>(packet_[2] << 8u) | packet_[3];
     }
@@ -156,8 +156,10 @@ public:
     bool IsValid() const;
 
     bool IsEmpty() const {
-        for (size_t i=0; i<packet_size_; i++) {
-            if (packet_[i] != 0) return false;
+        if (packet_) {
+            for (size_t i = 0; i < packet_size_; i++) {
+                if (packet_[i] != 0) return false;
+            }
         }
         return true;
     }
