@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 from os.path import join, dirname, abspath
-from sstcam_interfaces import WaveformDataPacket
+from sstcam.interfaces import WaveformDataPacket
 
 
 @pytest.fixture(scope="module")

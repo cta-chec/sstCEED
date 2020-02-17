@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 from os.path import join, dirname, abspath
-from sstcam_interfaces import WaveformRunHeader, WaveformEventR0, WaveformEventR1
+from sstcam.interfaces import WaveformRunHeader, WaveformEventR0, WaveformEventR1
 
 
 @pytest.fixture(scope="module")
