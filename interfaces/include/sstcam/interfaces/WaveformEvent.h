@@ -38,14 +38,38 @@ constexpr uint8_t DEFAULT_N_MODULES = 32;
 void GetHardcodedModuleSituation(std::set<uint8_t>& active_modules,
     size_t& n_pixels, uint8_t& first_active_module_slot);
 
+inline uint16_t GetSampleR0(Waveform& wf, uint16_t isam, float=1., float=0.) {
+    return wf.GetSample12bit(isam);
+}
+
+inline float GetSampleR1(Waveform& wf, uint16_t isam, float scale=1., float offset=0.) {
+    auto sample = static_cast<float>(wf.GetSample16bit(isam));
+    return (sample / scale) - offset;
+}
+
 /*!
  * @class WaveformEvent
  * @brief Container for an event to be used for the building and reading of events.
  * By default this class does not own nor manage the memory used for the data packets. Its
  * purpose is a wrapper class for a collection of data packets, to provide bookkeeping
  * and convenient waveform access.
+ *
+ * A template class is used here for the following reasons:
+ *
+ * - It is important to distinguish between R0 and R1 events, as the samples
+ * are accessed differently from the packets
+ *
+ * - Code duplication is avoided as much as possible
+ *
+ * - It is appropriate and accurate to represent R0 waveforms as uint16 and R1
+ * waveforms as float
+ *
+ * - A class inheritance structure, defining the GetSample method for R0 and R1
+ * respectively, would result in many virtual table lookups in the GetWaveforms
+ * method. This template structure avoids that by inlining the function into
+ * the loop. (See http://groups.di.unipi.it/~nids/docs/templates_vs_inheritance.html)
  */
-template<typename T>
+template<typename T, T TGetSample(Waveform&, uint16_t, float, float)>
 class WaveformEvent {
 public:
     /*!
@@ -62,13 +86,15 @@ public:
      */
     explicit WaveformEvent(size_t n_packets_per_event,
         size_t n_pixels=DEFAULT_N_MODULES*N_PIXELS_PER_MODULE,
-        uint8_t first_active_module_slot=0)
+        uint8_t first_active_module_slot=0, float scale=1., float offset=0.)
         : n_packets_per_event_(n_packets_per_event),
           packets_(n_packets_per_event),
           packets_owned_(n_packets_per_event),
           packet_index_(0),
           n_pixels_(n_pixels),
-          first_active_module_slot_(first_active_module_slot)
+          first_active_module_slot_(first_active_module_slot),
+          scale_(scale),
+          offset_(offset)
     { }
 
     virtual ~WaveformEvent() = default;
@@ -127,7 +153,8 @@ public:
                 uint16_t n_samples = waveform.GetNSamples();
                 uint16_t ipix = module*N_PIXELS_PER_MODULE + waveform.GetPixelID();
                 for (unsigned short isam = 0; isam < n_samples; isam++) {
-                    samples[ipix * n_samples + isam] = GetSample(waveform, isam);
+                    samples[ipix * n_samples + isam] = TGetSample(
+                        waveform, isam, scale_, offset_);
                 }
             }
         }
@@ -139,7 +166,11 @@ public:
 
     size_t GetNPixels() const { return n_pixels_; }
 
-    size_t GetNSamples() const { return packets_[0]->GetWaveformNSamples(); }
+    size_t GetNSamples() const { return GetFirstPacket()->GetWaveformNSamples(); }
+
+    float GetScale() { return scale_; }
+
+    float GetOffset() { return offset_; }
 
     // Convenience methods for event information from packets___________________
 
@@ -170,6 +201,8 @@ private:
     uint16_t packet_index_;
     size_t n_pixels_;
     uint8_t first_active_module_slot_;
+    float scale_;
+    float offset_;
 
     // Get the first packet that is not empty
     WaveformDataPacket* GetFirstPacket() const {
@@ -179,58 +212,19 @@ private:
         std::cerr << "No filled WaveformDataPacket found in event" << std::endl;
         return nullptr;
     }
-
-    // Abstract method to get a single sample's value. Different operation is
-    // required between R0 and R1 events
-    virtual T GetSample(Waveform& wf, uint16_t isam) const = 0;
 };
 
 /*!
  * @class WaveformEventR0
  * @brief WaveformEvent class for R0 events (raw from the camera before calibration)
  */
-class WaveformEventR0 : public WaveformEvent<uint16_t> {
-public:
-    explicit WaveformEventR0(size_t n_packets_per_event,
-                             size_t n_pixels=DEFAULT_N_MODULES*N_PIXELS_PER_MODULE,
-                             uint8_t first_active_module_slot=0)
-        : WaveformEvent<uint16_t>(n_packets_per_event,
-            n_pixels, first_active_module_slot) {}
-
-    // Method to obtain a single sample's value for R0 events
-    uint16_t GetSample(Waveform& wf, uint16_t isam) const final {
-        return wf.GetSample12bit(isam);
-    }
-};
+using WaveformEventR0 = WaveformEvent<uint16_t, GetSampleR0>;
 
 /*!
  * @class WaveformEventR1
  * @brief WaveformEvent class for R1 events (post low-level calibration)
  */
-class WaveformEventR1 : public WaveformEvent<float> {
-public:
-    explicit WaveformEventR1(size_t n_packets_per_event,
-                             size_t n_pixels=DEFAULT_N_MODULES*N_PIXELS_PER_MODULE,
-                             uint8_t first_active_module_slot=0,
-                             float scale=1., float offset=0.)
-        : WaveformEvent<float>(n_packets_per_event,  n_pixels, first_active_module_slot),
-          scale_(scale), offset_(offset) {}
-
-    // Method to obtain a single sample's value for R1 events
-    float GetSample(Waveform& wf, uint16_t isam) const final {
-        auto sample = static_cast<float>(wf.GetSample16bit(isam));
-        return (sample / scale_) - offset_;
-    }
-
-    float GetScale() const { return scale_; }
-
-    float GetOffset() const { return offset_; }
-
-private:
-    float scale_;
-    float offset_;
-};
-
+using WaveformEventR1 = WaveformEvent<float, GetSampleR1>;
 
 }}
 

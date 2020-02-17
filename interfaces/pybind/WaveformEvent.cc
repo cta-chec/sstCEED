@@ -21,33 +21,33 @@ void get_hardcoded_module_situation(py::module &m) {
           });
 }
 
-template<typename T, typename TT>
-py::array_t<TT> GetWaveforms(const T& waveform_event) {
-    auto v = new std::vector<TT>(waveform_event.GetWaveforms());
-    auto capsule = py::capsule(v, [](void *v) { delete reinterpret_cast<std::vector<TT>*>(v); });
+template<typename T, typename TEvent>
+py::array_t<T> GetWaveforms(const TEvent& waveform_event) {
+    auto v = new std::vector<T>(waveform_event.GetWaveforms());
+    auto capsule = py::capsule(v, [](void *v) { delete reinterpret_cast<std::vector<T>*>(v); });
     auto n_pixels = static_cast<long>(waveform_event.GetNPixels());
     auto n_samples = static_cast<long>(waveform_event.GetNSamples());
     auto shape = std::vector<ptrdiff_t>{n_pixels, n_samples};
     return py::array(shape, v->data(), capsule);
 }
 
-template<typename T, typename TT>
+template<typename T, typename TEvent>
 void waveform_event_template(py::module &m, const std::string& name) {
-    py::class_<T> waveform_event(m, name.c_str());
+    py::class_<TEvent> waveform_event(m, name.c_str());
     waveform_event.def(py::init<size_t, size_t, uint8_t>());
-    waveform_event.def("GetWaveforms", GetWaveforms<T, TT>);
-    waveform_event.def("GetPackets", &T::GetPackets);
-    waveform_event.def("GetNPixels", &T::GetNPixels);
-    waveform_event.def("GetNSamples", &T::GetNSamples);
-    waveform_event.def("IsMissingPackets", &T::IsMissingPackets);
-    waveform_event.def("GetFirstCellID", &T::GetFirstCellID);
-    waveform_event.def("GetTACK", &T::GetTACK);
-    waveform_event.def("IsStale", &T::IsStale);
+    waveform_event.def("GetWaveforms", GetWaveforms<T, TEvent>);
+    waveform_event.def("GetPackets", &TEvent::GetPackets);
+    waveform_event.def("GetNPixels", &TEvent::GetNPixels);
+    waveform_event.def("GetNSamples", &TEvent::GetNSamples);
+    waveform_event.def("IsMissingPackets", &TEvent::IsMissingPackets);
+    waveform_event.def("GetFirstCellID", &TEvent::GetFirstCellID);
+    waveform_event.def("GetTACK", &TEvent::GetTACK);
+    waveform_event.def("IsStale", &TEvent::IsStale);
 }
 
 void waveform_event(py::module &m) {
-    waveform_event_template<WaveformEventR0, uint16_t>(m, "WaveformEventR0");
-    waveform_event_template<WaveformEventR1, float>(m, "WaveformEventR1");
+    waveform_event_template<uint16_t, WaveformEventR0>(m, "WaveformEventR0");
+    waveform_event_template<float, WaveformEventR1>(m, "WaveformEventR1");
 }
 
 }}
