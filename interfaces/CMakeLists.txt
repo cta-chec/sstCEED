@@ -42,24 +42,11 @@ python_module(${PYTARGET} ${LIBTARGET} interfaces "${PYTHON_SRC}")
 
 # ctests
 add_library(test_main OBJECT ctests/test_main.cc)
+target_include_directories(test_main PUBLIC ctests ${DOCTEST_INCLUDE_DIR})
 
-add_executable(test_WaveformDataPacket ctests/WaveformDataPacket.cc $<TARGET_OBJECTS:test_main>)
-add_test(NAME test_WaveformDataPacket COMMAND test_WaveformDataPacket)
-target_link_libraries(test_WaveformDataPacket ${LIBTARGET})
-target_include_directories(test_WaveformDataPacket PUBLIC ctests)
-target_compile_features(test_WaveformDataPacket PRIVATE cxx_std_11)
-
-add_executable(test_Waveform ctests/Waveform.cc $<TARGET_OBJECTS:test_main>)
-add_test(NAME test_Waveform COMMAND test_Waveform)
-target_link_libraries(test_Waveform ${LIBTARGET})
-target_include_directories(test_Waveform PUBLIC ctests)
-target_compile_features(test_Waveform PRIVATE cxx_std_11)
-
-add_executable(test_WaveformEvent ctests/WaveformEvent.cc $<TARGET_OBJECTS:test_main>)
-add_test(NAME test_WaveformEvent COMMAND test_WaveformEvent)
-target_link_libraries(test_WaveformEvent ${LIBTARGET})
-target_include_directories(test_WaveformEvent PUBLIC ctests)
-target_compile_features(test_WaveformEvent PRIVATE cxx_std_11)
+sstcam_tests(test_WaveformDataPacket ctests/WaveformDataPacket.cc test_main ${LIBTARGET})
+sstcam_tests(test_Waveform ctests/Waveform.cc test_main ${LIBTARGET})
+sstcam_tests(test_WaveformEvent ctests/WaveformEvent.cc test_main ${LIBTARGET})
 
 # data files
 file(GLOB DATA_FILES "${CMAKE_CURRENT_SOURCE_DIR}/share/sstcam/interfaces/*")
